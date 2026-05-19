@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openai-ads-mcp"
+version = "0.2.0"
+description = "MCP server for the OpenAI ChatGPT Ads API"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.11.0",
+    "pydantic-core>=2.27.0",
+    "mcp[cli]>=1.2.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+    "uvicorn>=0.30.0",
+]
+
+[project.scripts]
+openai-ads-mcp = "openai_ads_mcp.server:main"
+
+[tool.setuptools.packages.find]
+include = ["openai_ads_mcp*"]

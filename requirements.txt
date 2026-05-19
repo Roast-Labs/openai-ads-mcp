@@ -1,0 +1,15 @@
+# Pinned transitively by mcp/pydantic; listed so a bad partial install is obvious.
+pydantic>=2.11.0
+pydantic-core>=2.27.0
+
+# MCP server framework (provides mcp.server.fastmcp.FastMCP)
+mcp[cli]>=1.2.0
+
+# Outbound HTTP client used to call the OpenAI Ads API
+httpx>=0.27.0
+
+# Load environment variables from a local .env during development
+python-dotenv>=1.0.0
+
+# ASGI server for optional HTTP transport
+uvicorn>=0.30.0
