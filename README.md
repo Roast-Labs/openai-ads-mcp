@@ -1,4 +1,4 @@
-# OpenAI ChatGPT Ads MCP Server
+# OpenAI Ads MCP Server (ChatGPT Ads)
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that
 exposes the [ChatGPT Ads API](https://developers.openai.com/ads/api-reference/authentication)
