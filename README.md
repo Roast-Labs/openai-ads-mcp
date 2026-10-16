@@ -41,8 +41,10 @@ python -m openai_ads_mcp --transport http   streamable HTTP (remote clients)
 - **This server → Ads API.** Set `OPENAI_ADS_API_KEY` (header
   `Authorization: Bearer …` per the
   [authentication docs](https://developers.openai.com/ads/api-reference/authentication)).
-- **Caller → this server.** Not enforced by default. Put auth (API gateway, reverse proxy,
-  VPN, etc.) in front of HTTP mode if you expose it publicly.
+- **Caller → this server (HTTP only).** Set `MCP_AUTH_TOKEN` to a long random secret.
+  Every HTTP request must send `Authorization: Bearer <MCP_AUTH_TOKEN>`; missing or wrong
+  tokens get a `401`. The HTTP transport refuses to start if `MCP_AUTH_TOKEN` is unset or
+  empty. Stdio transport does not use this token.
 
 **Secrets:** keep Ads keys out of git — copy `.env.example` to `.env` and add your key there.
 Never commit real keys.
@@ -106,18 +108,23 @@ Or set `OPENAI_ADS_API_KEY` in the `env` block instead of using `.env`.
 
 ### Run (HTTP — for remote MCP clients)
 
+`MCP_AUTH_TOKEN` must be set (in `.env` or the environment) or the server exits with an error.
+
 ```powershell
+$env:MCP_AUTH_TOKEN = "<long-random-secret>"
 python -m openai_ads_mcp --transport http --host 127.0.0.1 --port 8000
 ```
 
-Point remote MCP clients at `http://127.0.0.1:8000/mcp`. To expose publicly, tunnel
-with ngrok or similar and add auth at the gateway layer.
+Point remote MCP clients at `http://127.0.0.1:8000/mcp` and have them send the header
+`Authorization: Bearer <MCP_AUTH_TOKEN>` on every request. Requests without a matching
+token receive `401 Unauthorized`.
 
 ## Environment variables
 
 | Variable | Required | Description |
 | -------- | -------- | ----------- |
 | `OPENAI_ADS_API_KEY` | Yes | Ads API key |
+| `MCP_AUTH_TOKEN` | Yes, for HTTP mode | Bearer token clients must send to the HTTP transport. Not used by stdio. |
 
 ## Project layout
 

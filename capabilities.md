@@ -8,11 +8,9 @@ parameters, and notes. Official reference:
 **Authentication:** set `OPENAI_ADS_API_KEY`; requests use
 `Authorization: Bearer <key>` against `https://api.ads.openai.com/v1`.
 
-**Current surface:** only read/list/report tools are registered — **GET**
-operations equivalent below. Create/update/state-change actions and file uploads
-are **not** exposed until explicitly re-added.
+**Current surface:** read/list/report tools plus write and state-change tools are registered. New campaigns, ad groups, and ads default to `paused`; archive actions are destructive.
 
-All registered tools use MCP annotations **`readOnlyHint: true`**.
+Write tools use MCP annotations with **`readOnlyHint: false`**. Read tools remain annotated with **`readOnlyHint: true`**.
 
 ---
 
@@ -37,6 +35,13 @@ Optional: `limit`, `after`, `before`, `order` (`asc` | `desc`).
 
 - `campaign_id` (string)
 
+### Campaign write tools
+
+- `create_campaign`: creates a paused campaign by default; requires `name` and `lifetime_spend_limit_micros`.
+- `update_campaign`: updates campaign fields and budget.
+- `activate_campaign`, `pause_campaign`, `archive_campaign`: change campaign state.
+- `duplicate_campaign`: copies a campaign, its ad groups, and ads. The copies remain paused and require a lifetime budget (`lifetime_spend_limit_micros`). `bidding_type` defaults to `conversions`; `max_bid_micros` optionally overrides the bid of the copied ad groups.
+
 ---
 
 ## Ad groups
@@ -51,6 +56,12 @@ Optional: `limit`, `after`, `before`, `order` (`asc` | `desc`).
 
 - `ad_group_id`
 
+### Ad-group write tools
+
+- `create_ad_group`: creates a paused ad group by default.
+- `update_ad_group`: updates ad-group fields.
+- `activate_ad_group`, `pause_ad_group`, `archive_ad_group`: change ad-group state.
+
 ---
 
 ## Ads
@@ -64,6 +75,12 @@ Optional: `limit`, `after`, `before`, `order` (`asc` | `desc`).
 ### `get_ad`
 
 - `ad_id`
+
+### Ad write tools
+
+- `create_ad`: creates a paused ad by default and requires creative data.
+- `update_ad`: updates name, status, or creative.
+- `activate_ad`, `pause_ad`, `archive_ad`: change ad state.
 
 ---
 

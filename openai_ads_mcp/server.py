@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+from openai_ads_mcp.auth import AUTH_TOKEN_ENV, BearerAuthMiddleware, get_auth_token
 from openai_ads_mcp.coordinator import mcp
 
 from openai_ads_mcp.tools import (  # noqa: F401
@@ -32,12 +33,24 @@ def run_http(host: str, port: int) -> None:
     """Run the MCP server over streamable HTTP (for remote MCP clients)."""
     import uvicorn
 
+    token = get_auth_token()
+    if token is None:
+        print(
+            f"OpenAI Ads MCP: refusing to start HTTP transport because {AUTH_TOKEN_ENV} "
+            "is not set. Set it to a long random secret; clients must send "
+            "'Authorization: Bearer <token>'.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+
     print(
-        f"OpenAI Ads MCP: listening on http://{host}:{port}/mcp",
+        f"OpenAI Ads MCP: listening on http://{host}:{port}/mcp (bearer auth enabled)",
         file=sys.stderr,
         flush=True,
     )
-    uvicorn.run(mcp.streamable_http_app(), host=host, port=port, log_level="warning")
+    app = BearerAuthMiddleware(mcp.streamable_http_app(), token)
+    uvicorn.run(app, host=host, port=port, log_level="warning")
 
 
 def main(argv: list[str] | None = None) -> None:
